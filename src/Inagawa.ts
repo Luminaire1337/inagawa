@@ -3,12 +3,12 @@ import { pino, Logger } from 'pino';
 import { LoginToken, Logs, Warehouse } from './remote';
 
 export default class Inagawa {
-  private client: Client = new Client({ intents: [] });
-  private logger: Logger = pino({ name: 'Inagawa' });
+  private readonly client: Client = new Client({ intents: [] });
+  private readonly logger: Logger = pino({ name: 'Inagawa' });
 
-  private remoteLoginToken: LoginToken = new LoginToken();
-  private remoteWarehuse: Warehouse = new Warehouse(this.remoteLoginToken);
-  private remoteLogs: Logs = new Logs();
+  private readonly remoteLoginToken: LoginToken = new LoginToken();
+  private readonly remoteWarehuse: Warehouse = new Warehouse(this.remoteLoginToken);
+  private readonly remoteLogs: Logs = new Logs();
 
   public constructor() {
     this.client.once(Events.ClientReady, () => this.clientReady());
