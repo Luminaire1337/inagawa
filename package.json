@@ -1,0 +1,37 @@
+{
+  "name": "inagawa",
+  "version": "0.0.1",
+  "description": "A Discord Bot that manages your MTA:SA Paradise RPG organization",
+  "main": "dist/index.js",
+  "scripts": {
+    "fix": "prettier --write .",
+    "lint": "eslint --ext .ts src/",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts | pino-pretty"
+  },
+  "keywords": [
+    "discord",
+    "paradiserpg"
+  ],
+  "author": "Luminaire1337",
+  "license": "Beerware",
+  "devDependencies": {
+    "@spotify/eslint-config-base": "^14.1.6",
+    "@spotify/eslint-config-typescript": "^14.1.6",
+    "@spotify/prettier-config": "^14.1.6",
+    "@types/node": "^18.14.2",
+    "@typescript-eslint/eslint-plugin": "^5.54.0",
+    "@typescript-eslint/parser": "^5.54.0",
+    "eslint": "^8.35.0",
+    "pino-pretty": "^9.4.0",
+    "prettier": "^2.8.4",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "discord.js": "^14.7.1",
+    "dotenv": "^16.0.3",
+    "pino": "^8.11.0"
+  }
+}
