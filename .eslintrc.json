@@ -1,0 +1,6 @@
+{
+  "extends": [
+    "@spotify/eslint-config-base",
+    "@spotify/eslint-config-typescript"
+  ]
+}
