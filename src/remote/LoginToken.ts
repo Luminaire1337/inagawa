@@ -1,13 +1,13 @@
 import { pino, Logger } from 'pino';
 import Signal from './Signal';
 
-interface ILoginRequestData {
+interface ILoginRequest {
   code?: '';
   login: string;
   password: string;
 }
 
-interface ILoginRequestResponseData {
+interface ILoginRequestResponse {
   error: boolean;
   token: string;
   user: string;
@@ -15,21 +15,21 @@ interface ILoginRequestResponseData {
 
 export default class LoginToken {
   private token?: string;
-  private readonly logger: Logger = pino({ name: 'LoginToken' });
-  private readonly onChange: Signal<LoginToken, string> = new Signal<LoginToken, string>();
+  private readonly logger: Logger = pino({ name: this.constructor.name });
+  private readonly onChange: Signal<string> = new Signal<string>();
 
   public constructor() {
     this.refresh();
     setInterval(async () => await this.refresh(), 6 * 3600 * 1000);
   }
 
-  public get ChangeEvent(): Signal<LoginToken, string> {
+  public get ChangeEvent(): Signal<string> {
     return this.onChange;
   }
 
   private async refresh(): Promise<void> {
     try {
-      const bodyData: ILoginRequestData = {
+      const bodyData: ILoginRequest = {
         login: process.env.PARADISERPG_LOGIN,
         password: process.env.PARADISERPG_PASSWORD,
       };
@@ -42,7 +42,7 @@ export default class LoginToken {
         body: JSON.stringify(bodyData),
       });
 
-      const responseData: ILoginRequestResponseData = (await response.json()) as ILoginRequestResponseData;
+      const responseData: ILoginRequestResponse = (await response.json()) as ILoginRequestResponse;
 
       if (responseData.error === true) {
         throw Error('Something went wrong with fetching LoginToken');
@@ -53,7 +53,7 @@ export default class LoginToken {
       this.logger.error(error);
       setTimeout(async () => await this.refresh(), 1000);
     } finally {
-      this.onChange.trigger(this, this.token);
+      this.onChange.trigger(this.token);
       if (process.env.NODE_ENV === 'development') this.logger.info('Login token refreshed!');
     }
   }

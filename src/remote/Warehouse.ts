@@ -1,4 +1,5 @@
 import { pino, Logger } from 'pino';
+import { PrismaClient } from '@prisma/client';
 import LoginToken from './LoginToken';
 import Signal from './Signal';
 
@@ -45,22 +46,24 @@ interface IWarehouse {
 export default class Warehouse {
   private token?: string;
   private warehouseVehicles?: IWarehouseVehicle[];
-  private readonly logger: Logger = pino({ name: 'Warehouse' });
-  private readonly onChange: Signal<Warehouse, IWarehouseVehicle[]> = new Signal<Warehouse, IWarehouseVehicle[]>();
+  private prisma?: PrismaClient;
+  private readonly logger: Logger = pino({ name: this.constructor.name });
+  private readonly onChange: Signal<IWarehouseVehicle[]> = new Signal<IWarehouseVehicle[]>();
 
-  public constructor(remoteLoginToken: LoginToken) {
-    remoteLoginToken.ChangeEvent.on(async (_, token: string) => {
-      this.token = token;
-      if (process.env.NODE_ENV === 'development') this.logger.info('New login token received!');
+  public constructor(prisma: PrismaClient, remoteLoginToken: LoginToken) {
+    this.prisma = prisma;
 
-      await this.refresh();
-    });
-
+    remoteLoginToken.ChangeEvent.on(async token => this.updateLoginToken(token));
     setInterval(async () => this.refresh(), 60 * 1000);
   }
 
-  public get ChangeEvent(): Signal<Warehouse, IWarehouseVehicle[]> {
+  public get ChangeEvent(): Signal<IWarehouseVehicle[]> {
     return this.onChange;
+  }
+
+  private async updateLoginToken(token: string): Promise<void> {
+    this.token = token;
+    await this.refresh();
   }
 
   private async refresh(): Promise<void> {
@@ -84,7 +87,13 @@ export default class Warehouse {
       this.logger.error(error);
       setTimeout(async () => await this.refresh(), 1000);
     } finally {
-      this.logger.info(this.warehouseVehicles);
+      /**
+      const unassignedRemoteInstances = await this.prisma.warehouse.findMany({
+        where: {
+          remoteId: null,
+        },
+      });
+      **/
     }
   }
 }
