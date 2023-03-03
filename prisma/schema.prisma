@@ -6,26 +6,29 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./inagawa.db"
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
-model Warehouse {
+model WarehouseVehicle {
   id              Int       @id @default(autoincrement())
   remoteId        Int?      @unique()
   vehicleName     String
-  vehicleId       Int?
   importerName    String
   currentPrice    Int
-  exported        Boolean   @default(false)
-  exporterName    String?
-  exportedPrice   Int?
 }
 
 model Log {
   id              Int       @id @default(autoincrement())
   remoteId        Int       @unique()
-  authorName      String
+  memberName      String
   message         String
   time            DateTime  @default(now())
+}
+
+model Payout {
+  id              Int       @id @default(autoincrement())
+  memberName      String    @unique()
+  payoutAmount    Int
+  payoutPaid      Boolean   @default(false)
 }

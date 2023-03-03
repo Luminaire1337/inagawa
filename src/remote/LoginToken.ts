@@ -14,7 +14,7 @@ interface ILoginRequestResponse {
 }
 
 export default class LoginToken {
-  private token?: string;
+  private token: string;
   private readonly logger: Logger = pino({ name: this.constructor.name });
   private readonly onChange: Signal<string> = new Signal<string>();
 

@@ -1,6 +1,6 @@
 import { Client, Events } from 'discord.js';
 import { pino, Logger } from 'pino';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Log, WarehouseVehicle } from '@prisma/client';
 import { LoginToken, Logs, Warehouse } from './remote';
 
 export default class Inagawa {
@@ -15,9 +15,20 @@ export default class Inagawa {
   public constructor() {
     this.client.once(Events.ClientReady, () => this.clientReady());
     this.client.login(process.env.DISCORD_TOKEN);
+
+    this.remoteLogs.NewLogEvent.on(async log => this.announceNewLog(log));
+    this.remoteWarehuse.VehiclePriceUpdateEvent.on(async vehicle => this.announceVehiclePriceUpdate(vehicle));
   }
 
   private clientReady(): void {
     this.logger.info(`Logged in as ${this.client.user.tag}`);
+  }
+
+  private async announceNewLog(log: Log): Promise<void> {
+    this.logger.info(log);
+  }
+
+  private async announceVehiclePriceUpdate(vehicle: WarehouseVehicle): Promise<void> {
+    this.logger.info(vehicle);
   }
 }

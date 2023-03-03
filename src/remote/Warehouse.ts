@@ -1,5 +1,5 @@
 import { pino, Logger } from 'pino';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, WarehouseVehicle } from '@prisma/client';
 import LoginToken from './LoginToken';
 import Signal from './Signal';
 
@@ -46,19 +46,16 @@ interface IWarehouse {
 export default class Warehouse {
   private token?: string;
   private warehouseVehicles?: IWarehouseVehicle[];
-  private prisma?: PrismaClient;
   private readonly logger: Logger = pino({ name: this.constructor.name });
-  private readonly onChange: Signal<IWarehouseVehicle[]> = new Signal<IWarehouseVehicle[]>();
+  private readonly onVehiclePriceUpdate: Signal<WarehouseVehicle> = new Signal<WarehouseVehicle>();
 
-  public constructor(prisma: PrismaClient, remoteLoginToken: LoginToken) {
-    this.prisma = prisma;
-
-    remoteLoginToken.ChangeEvent.on(async token => this.updateLoginToken(token));
+  public constructor(private prisma: PrismaClient, private remoteLoginToken: LoginToken) {
+    this.remoteLoginToken.ChangeEvent.on(async token => this.updateLoginToken(token));
     setInterval(async () => this.refresh(), 60 * 1000);
   }
 
-  public get ChangeEvent(): Signal<IWarehouseVehicle[]> {
-    return this.onChange;
+  public get VehiclePriceUpdateEvent(): Signal<WarehouseVehicle> {
+    return this.onVehiclePriceUpdate;
   }
 
   private async updateLoginToken(token: string): Promise<void> {
